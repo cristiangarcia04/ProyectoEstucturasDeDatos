@@ -89,3 +89,14 @@ void CompactChainList::push_back(Element &e, int &num){
     }
     CCLsize += num;
 }
+
+list<Element> CompactChainList::expand() {
+    list<Element> aux;
+    list <pair<Element, int>>:: iterator i;
+    for (i = CCL.begin(); i != CCL.end(); ++i) {
+        for (int j = 0; j < i->second; j++) {
+            aux.push_back(i->first);
+        }
+    }    
+    return aux;
+}
