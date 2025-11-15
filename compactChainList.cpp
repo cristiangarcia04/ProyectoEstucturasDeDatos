@@ -92,11 +92,32 @@ void CompactChainList::push_back(Element &e, int &num){
 
 list<Element> CompactChainList::expand() {
     list<Element> aux;
-    list <pair<Element, int>>:: iterator i;
-    for (i = CCL.begin(); i != CCL.end(); ++i) {
-        for (int j = 0; j < i->second; j++) {
-            aux.push_back(i->first);
+    for (int i = 0; i < CCL.size(); ++i) {
+        for (int j = 0; j < CCL[i].second; j++) {
+            aux.push_back(CCL[i].first);
         }
     }    
     return aux;
+}
+
+void CompactChainList::removeBlockPosition (int &pos) {
+    int conteo = 0;
+    bool eliminado = false;
+    for (int i = 0; i < CCL.size(); ++i) {
+        if (!eliminado) {
+            
+            int inicio = conteo;
+            int final = conteo + CCL[i].second - 1;
+
+            if (inicio <= pos && pos <= final) {
+                CCL.erase(CCL.begin() + i);
+                eliminado = true;
+            }
+        }
+
+        if (!eliminado) {
+           conteo += CCL[i].second; 
+        }
+        
+    }
 }
