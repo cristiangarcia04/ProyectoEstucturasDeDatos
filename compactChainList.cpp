@@ -117,7 +117,27 @@ void CompactChainList::removeBlockPosition (int &pos) {
 
         if (!eliminado) {
            conteo += CCL[i].second; 
+        }  
+    }
+}
+
+void CompactChainList::set(int &pos, Element &e) {
+    int conteo = 0;
+    bool cambiado = false;
+    for (int i = 0; i < CCL.size(); ++i) {
+        if (!cambiado) {
+            
+            int inicio = conteo;
+            int final = conteo + CCL[i].second - 1;
+
+            if (inicio <= pos && pos <= final) {
+                CCL[i].first = e;
+                cambiado = true;
+            }
         }
-        
+
+        if (!cambiado) {
+           conteo += CCL[i].second; 
+        }
     }
 }
