@@ -161,13 +161,23 @@ bool CompactChainList::operator<(const CompactChainList &oth) const{
 }
 
 
-bool CompactChainList::operator==(const CompactChainList &oth) const{}
+bool CompactChainList::operator==(const CompactChainList &oth) const{
+    if (CCLsize != oth.CCLsize) {
+        return false;
+    }
 
+    if (CCL.size() != oth.CCL.size()) {
+        return false;
+    }
 
-bool CompactChainList::operator==(const Element &oth) const{}
+    for (int i = 0; i < CCLsize();i++) {
+        if (CCL[i].first != oth.CCL[i].first || CCL[i].second != oth.CCL[i].second) {
+            return false;
+        }
+    }
+    return true;
+}
 
-
-bool CompactChainList::operator==(const int &oth) const{}
 
 
 Element CompactChainList::operator[](const int pos) const{
@@ -181,7 +191,55 @@ Element CompactChainList::operator[](const int pos) const{
 }
 
 
-CompactChainList CompactChainList::operator+(const CompactChainList &oth) const{}
+CompactChainList CompactChainList::operator+(const CompactChainList &oth) const{
+    CompactChainList aux;
+    if (oth.CCL.empty() && !CCL.empty()) {
+        return CCL;
+    }
+
+    if (!oth.CCL.empty() && CCL.empty()) {
+        return oth;
+    }
+
+    if (oth.CCL.empty() && CCL.empty()) {
+        return aux;
+    }
+    
+    int i, j = 0;
+
+    while (i < CCL.size() && j < oth.CCL.size()) {
+        Element e1 = CCL[i].first;
+        Element e2 = oth.CCL[j].first;
+
+        if (e1 < e2) {
+            aux.CCL.push_back(CCL[i]);
+            aux += oth.CCL[i].second;
+            i++;
+        } else if (e1 > e2) {
+            aux.CCL.push_back(oth.CCL[j]);
+            aux += oth.CCL[j].second;
+            j++;
+        } else  {
+            int fusion = CCL[i].second + oth.CCL[j].second;
+            aux.CCL.push_back(pair {e1, fusion});
+            i++;
+            j++;  
+        }
+    }
+
+    while (j < oth.CCL.size()) {
+        aux.CCL.push_back(oth.CCL[j]);
+        aux += oth.CCL[j].second;
+        j++;
+    }
+    
+    while (i < CCL.size()) {
+        aux.CCL.push_back(CCL[i]);
+        aux += oth.CCL[i].second;
+        i++;
+    }
+    return aux;
+}
 
 
 void CompactChainList::set(int &pos, Element &e) {
@@ -202,15 +260,15 @@ void CompactChainList::set(int &pos, Element &e) {
         int posInsert = indiceBloque;
             
         if (izquierda > 0) {
-            CCL.insert(CCL.begin() + posInsert, {orig, izquierda});
+            CCL.insert(CCL.begin() + posInsert, pair{orig, izquierda});
             posInsert++;
         }
         
-        CCL.insert(CCL.begin() + posInsert, {e, 1});
+        CCL.insert(CCL.begin() + posInsert, pair{e, 1});
         posInsert++;
         
         if (derecha > 0) {
-            CCL.insert(CCL.begin() + posInsert, {orig, derecha});
+            CCL.insert(CCL.begin() + posInsert, pair{orig, derecha});
         }
     }
     consecutiveBlock();
@@ -265,7 +323,7 @@ void CompactChainList::insertElement(int &pos, Element &e){
     }
 
     if (pos == 0) {
-        CCL.push_front({e, 1});
+        CCL.push_front(CCL.begin {e, 1});
         return;
     }
 
@@ -276,7 +334,7 @@ void CompactChainList::insertElement(int &pos, Element &e){
     for(int i = 0; i < indexCCL; i++){
         cnt += CCL[i].second;
     }
-        
+
     int posEnBloque = pos - cnt;
     int izquierda = posEnBloque;
     int derecha = CCL[indexCCL].second - posEnBloque;
@@ -291,15 +349,15 @@ void CompactChainList::insertElement(int &pos, Element &e){
         int posInsert = indexCCL;
             
         if (izquierda > 0) {
-            CCL.insert(CCL.begin() + posInsert, {orig, izquierda});
+            CCL.insert(CCL.begin() + posInsert, pair{orig, izquierda});
             posInsert++;
         }
         
-        CCL.insert(CCL.begin() + posInsert, {e, 1});
+        CCL.insert(CCL.begin() + posInsert, pair{e, 1});
         posInsert++;
         
         if (derecha > 0) {
-            CCL.insert(CCL.begin() + posInsert, {orig, derecha});
+            CCL.insert(CCL.begin() + posInsert, pair{orig, derecha});
         }
         
         CCLsize++;
