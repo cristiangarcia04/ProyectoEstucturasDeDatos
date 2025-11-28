@@ -25,26 +25,24 @@ class CompactChainList {
         int getOcurrences(vector<Element> &v);                              //NOT DONE
         int getIndexFirstOcurrence(vector<Element> &v);                     //NOT DONE
         CompactChainList getLexicographicFusion(CompactChainList &c);       //NOT DONE
-        list<Element> expand();                                             //DONE
+        list<Element> expand()const;                                        //DONE
 
-        bool operator<(const CompactChainList &oth) const;                  //NOT DONE
-        bool operator==(const CompactChainList &oth) const;                 //NOT DONE
-        bool operator==(const Element &oth) const;                          //NOT DONE
-        bool operator==(const int &oth) const;                              //NOT DONE
+        bool operator<(const CompactChainList &oth) const;                  //DONE
+        bool operator==(const CompactChainList &oth) const;                 //DONE
         Element operator[](const int pos) const;                            //DONE
-        CompactChainList operator+(const CompactChainList &oth) const;      //NOT DONE
+        CompactChainList operator+(const CompactChainList &oth) const;      //DONE
 
         void set(int &pos, Element &e);                                     //DONE
         void removeFirstOcurrence(Element &e);                              //DONE
         void removeAllOcurrences(Element &e);                               //DONE
         void removeBlockPosition(int &pos);                                 //DONE
-        void insertElement(int &pos, Element &e);                           //NOT DONE
+        void insertElement(int &pos, Element &e);                           //DONE
         void modifyAllOcurrences(Element &one, Element &two);               //DONE
         void push_front(Element &e, int &num);                              //DONE
         void push_back(Element &e, int &num);                               //DONE
-        static void sortVectorCCL(vector<CompactChainList> &v);             //NOT DONE
+        static void sortVectorCCL(vector<CompactChainList> &v);             //DONE
 
-        void combineEquals();                                               //NOT DONE
+        void combineEquals();                                               //DONE
         int getBlockIndex(const int &pos) const;                            //DONE
         void consecutiveBlock();                                            //DONE
 };
