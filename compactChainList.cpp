@@ -116,13 +116,74 @@ int CompactChainList::getIndexFirstConsecutiveOcurrence(vector<Element> &v){
 }
 
 
-int CompactChainList::getOcurrences(vector<Element> &v){}
+int CompactChainList::getOcurrences(vector<Element> &v){
+    string secuencia;
+    string ocurrencia;
+    int cnt = 0;
+
+    for(int i = 0; i < CCL.size(); i++){
+        for(int j = 0; j < CCL[i].second; j++){
+            secuencia += CCL[i].first;
+        }
+    }
+    for(int i = 0; i < v.size(); i++){
+        ocurrencia += v[i];
+    }
+    
+    for (int k = 0; k < secuencia.length();k++) {
+        int indice = 0;
+        int pos = k;
+
+        while (pos < secuencia.length() && indice < ocurrencia.length()) {
+            if (secuencia[pos] == ocurrencia[indice]) {
+                indice++;
+            }
+            pos++;
+        }
+
+        if (indice == ocurrencia.length()) {
+            cnt++;
+        }
+    }
+    return cnt;
+}
 
 
-int CompactChainList::getIndexFirstOcurrence(vector<Element> &v){}
+int CompactChainList::getIndexFirstOcurrence(vector<Element> &v){
+    string secuencia;
+    string ocurrencia;
 
+    for(int i = 0; i < CCL.size(); i++){
+        for(int j = 0; j < CCL[i].second; j++){
+            secuencia += CCL[i].first;
+        }
+    }
 
-CompactChainList CompactChainList::getLexicographicFusion(CompactChainList &c){}
+    for(int i = 0; i < v.size(); i++){
+        ocurrencia += v[i];
+    }
+
+    for (int k = 0; k < secuencia.length();k++) {
+        int indice = 0;
+        int pos = k;
+
+        while (pos < secuencia.length() && indice < ocurrencia.length()) {
+            if (secuencia[pos] == ocurrencia[indice]) {
+                indice++;
+            }
+            pos++;
+        }
+
+        if (indice == ocurrencia.length()) {
+            return k;
+        }
+    }
+    return -1;
+}
+
+CompactChainList CompactChainList::getLexicographicFusion(CompactChainList &c){
+    return operator+(c);
+}
 
 
 list<Element> CompactChainList::expand() const{
