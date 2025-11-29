@@ -22,9 +22,9 @@ class CompactChainList {
         int searchElement(Element &e);                                      //DONE
         int getConsecutiveOcurrences(vector<Element> &v);                   //DONE
         int getIndexFirstConsecutiveOcurrence(vector<Element> &v);          //DONE
-        int getOcurrences(vector<Element> &v);                              //NOT DONE
-        int getIndexFirstOcurrence(vector<Element> &v);                     //NOT DONE
-        CompactChainList getLexicographicFusion(CompactChainList &c);       //NOT DONE
+        int getOcurrences(vector<Element> &v);                              //DONE
+        int getIndexFirstOcurrence(vector<Element> &v);                     //DONE
+        CompactChainList getLexicographicFusion(CompactChainList &c);       //DONE
         list<Element> expand()const;                                        //DONE
 
         bool operator<(const CompactChainList &oth) const;                  //DONE
