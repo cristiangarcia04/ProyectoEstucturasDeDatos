@@ -75,16 +75,19 @@ int CompactChainList::getConsecutiveOcurrences(vector<Element> &v){
     for(int i = 0; i < v.size(); i++){
         ocurrencia += v[i];
     }
-    int buscar = secuencia.find(ocurrencia);
-    bool flag = true;
-
-    while(buscar < secuencia.length() && flag){
-        ans++;
-        int posicion = buscar + ocurrencia.length();
-        buscar = secuencia.find(ocurrencia, posicion);
-
-        if(buscar > secuencia.length()){
-            flag = false;
+    
+    int largoSecuencia = secuencia.length();
+    int largoOcurrencia = ocurrencia.length();
+    
+    for(int i = 0; i <= largoSecuencia - largoOcurrencia; i++){
+        bool coincide = true;
+        for(int j = 0; j < largoOcurrencia; j++){
+            if(secuencia[i + j] != ocurrencia[j]){
+                coincide = false;
+            }
+        }
+        if(coincide){
+            ans++;
         }
     }
     return ans;
@@ -119,7 +122,7 @@ int CompactChainList::getIndexFirstConsecutiveOcurrence(vector<Element> &v){
 int CompactChainList::getOcurrences(vector<Element> &v){
     string secuencia;
     string ocurrencia;
-    int cnt = 0;
+    int resultado = 0;
 
     for(int i = 0; i < CCL.size(); i++){
         for(int j = 0; j < CCL[i].second; j++){
@@ -130,28 +133,53 @@ int CompactChainList::getOcurrences(vector<Element> &v){
         ocurrencia += v[i];
     }
     
-    for (int k = 0; k < secuencia.length();k++) {
-        int indice = 0;
-        int pos = k;
-
-        while (pos < secuencia.length() && indice < ocurrencia.length()) {
-            if (secuencia[pos] == ocurrencia[indice]) {
-                indice++;
+    int n = secuencia.length();
+    int m = ocurrencia.length();
+    
+    if(m != 0 && n >= m){
+        // Crear tabla dp de (n+1) filas y (m+1) columnas
+        // dp[i][j] = formas de formar los primeros j caracteres de ocurrencia
+        //            usando los primeros i caracteres de secuencia
+        vector<vector<int>> dp;
+        
+        // Inicializar la tabla con ceros
+        for(int i = 0; i <= n; i++){
+            vector<int> fila;
+            for(int j = 0; j <= m; j++){
+                fila.push_back(0);
             }
-            pos++;
+            dp.push_back(fila);
         }
-
-        if (indice == ocurrencia.length()) {
-            cnt++;
+        
+        // Caso base: hay 1 forma de formar una subsecuencia vacía
+        for(int i = 0; i <= n; i++){
+            dp[i][0] = 1;
         }
+        
+        // Llenar la tabla DP
+        for(int i = 1; i <= n; i++){
+            for(int j = 1; j <= m; j++){
+                // Opción 1: No usar el carácter actual de secuencia
+                dp[i][j] = dp[i-1][j];
+                
+                // Opción 2: Usar el carácter actual si coincide
+                if(secuencia[i-1] == ocurrencia[j-1]){
+                    dp[i][j] = dp[i][j] + dp[i-1][j-1];
+                }
+            }
+        }
+        
+        resultado = dp[n][m];
     }
-    return cnt;
+    
+    return resultado;
 }
 
 
 int CompactChainList::getIndexFirstOcurrence(vector<Element> &v){
     string secuencia;
     string ocurrencia;
+    int resultado = -1;
 
     for(int i = 0; i < CCL.size(); i++){
         for(int j = 0; j < CCL[i].second; j++){
@@ -163,23 +191,30 @@ int CompactChainList::getIndexFirstOcurrence(vector<Element> &v){
         ocurrencia += v[i];
     }
 
-    for (int k = 0; k < secuencia.length();k++) {
+    // Buscar la primera posición donde comienza una subsecuencia válida
+    for (int k = 0; k < secuencia.length() && resultado == -1; k++) {
         int indice = 0;
         int pos = k;
+        int primera_pos = -1;
 
         while (pos < secuencia.length() && indice < ocurrencia.length()) {
             if (secuencia[pos] == ocurrencia[indice]) {
+                if (indice == 0) {
+                    primera_pos = pos;
+                }
                 indice++;
             }
             pos++;
         }
 
         if (indice == ocurrencia.length()) {
-            return k;
+            resultado = primera_pos;
         }
     }
-    return -1;
+    
+    return resultado;
 }
+
 
 CompactChainList CompactChainList::getLexicographicFusion(CompactChainList &c){
     return operator+(c);
@@ -554,10 +589,11 @@ void CompactChainList::consecutiveBlock() {
 
 }
 void CompactChainList::print() const {
+    printf("Size = %d, Blocks = %zu\n", CCLsize, CCL.size());
     printf("[");
     for(int i = 0; i < CCL.size(); i++){
-        if(i > 0) printf(", ");
-        printf("(%d,%d)", CCL[i].first, CCL[i].second);
+        if(i > 0) printf(",");
+        printf("{%d, %d}", CCL[i].first, CCL[i].second);
     }
     printf("]\n");    
 }
