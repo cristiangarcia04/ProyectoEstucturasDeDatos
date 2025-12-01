@@ -137,39 +137,34 @@ int CompactChainList::getOcurrences(vector<Element> &v){
     int m = ocurrencia.length();
     
     if(m != 0 && n >= m){
-        // Crear tabla dp de (n+1) filas y (m+1) columnas
-        // dp[i][j] = formas de formar los primeros j caracteres de ocurrencia
-        //            usando los primeros i caracteres de secuencia
-        vector<vector<int>> dp;
-        
-        // Inicializar la tabla con ceros
-        for(int i = 0; i <= n; i++){
-            vector<int> fila;
-            for(int j = 0; j <= m; j++){
-                fila.push_back(0);
-            }
-            dp.push_back(fila);
+        vector<int> anterior;
+        vector<int> actual;
+
+        for(int j = 0; j <= m; j++){
+            anterior.push_back(0);
+            actual.push_back(0);
         }
+
+        anterior[0] = 1;
+        actual[0] = 1;
         
-        // Caso base: hay 1 forma de formar una subsecuencia vacía
-        for(int i = 0; i <= n; i++){
-            dp[i][0] = 1;
-        }
-        
-        // Llenar la tabla DP
         for(int i = 1; i <= n; i++){
+            for(int j = 0; j <= m; j++){
+                actual[j] = anterior[j];
+            }
+
             for(int j = 1; j <= m; j++){
-                // Opción 1: No usar el carácter actual de secuencia
-                dp[i][j] = dp[i-1][j];
-                
-                // Opción 2: Usar el carácter actual si coincide
                 if(secuencia[i-1] == ocurrencia[j-1]){
-                    dp[i][j] = dp[i][j] + dp[i-1][j-1];
+                    actual[j] = actual[j] + anterior[j-1];
                 }
             }
+
+            for(int j = 0; j <= m; j++){
+                anterior[j] = actual[j];
+            }
         }
         
-        resultado = dp[n][m];
+        resultado = actual[m];
     }
     
     return resultado;
@@ -191,7 +186,6 @@ int CompactChainList::getIndexFirstOcurrence(vector<Element> &v){
         ocurrencia += v[i];
     }
 
-    // Buscar la primera posición donde comienza una subsecuencia válida
     for (int k = 0; k < secuencia.length() && resultado == -1; k++) {
         int indice = 0;
         int pos = k;
@@ -588,7 +582,7 @@ void CompactChainList::consecutiveBlock() {
     }
 
 }
-void CompactChainList::print() const {
+void CompactChainList::print() {
     printf("Size = %d, Blocks = %zu\n", CCLsize, CCL.size());
     printf("[");
     for(int i = 0; i < CCL.size(); i++){
