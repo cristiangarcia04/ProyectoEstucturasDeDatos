@@ -5,8 +5,10 @@
 #include <list>
 #include <utility>
 #include <string>
+#include <algorithm>
 using namespace std;
-typedef char Element;
+
+typedef int Element;
 
 class CompactChainList {
     private:
@@ -14,37 +16,38 @@ class CompactChainList {
         int CCLsize = 0;
 
     public:
-        CompactChainList();                                                 //DONE
-        CompactChainList(vector<Element> &v);                               //DONE
-        CompactChainList(CompactChainList &c);                              //DONE
+        CompactChainList();
+        CompactChainList(vector<Element> &v);
+        CompactChainList(const CompactChainList &c);
 
-        int size();                                                         //DONE
-        int searchElement(Element &e);                                      //DONE
-        int getConsecutiveOcurrences(vector<Element> &v);                   //DONE
-        int getIndexFirstConsecutiveOcurrence(vector<Element> &v);          //DONE
-        int getOcurrences(vector<Element> &v);                              //DONE
-        int getIndexFirstOcurrence(vector<Element> &v);                     //DONE
-        CompactChainList getLexicographicFusion(CompactChainList &c);       //DONE
-        list<Element> expand()const;                                        //DONE
+        int size();
+        int searchElement(Element e);
+        int getConsecutiveOcurrences(vector<Element> &v);
+        int getIndexFirstConsecutiveOcurrence(vector<Element> &v);
+        int getOcurrences(vector<Element> &v);
+        int getIndexFirstOcurrence(vector<Element> &v);
+        CompactChainList getLexicographicFusion(CompactChainList &c);
+        list<Element> expand() const;
 
-        bool operator<(const CompactChainList &oth) const;                  //DONE
-        bool operator==(const CompactChainList &oth) const;                 //DONE
-        Element operator[](const int pos) const;                            //DONE
-        CompactChainList operator+(const CompactChainList &oth) const;      //DONE
+        bool operator<(const CompactChainList &oth) const;
+        bool operator==(const CompactChainList &oth) const;
+        Element operator[](const int pos) const;
+        CompactChainList operator+(const CompactChainList &oth) const;
 
-        void set(int &pos, Element &e);                                     //DONE
-        void removeFirstOcurrence(Element &e);                              //DONE
-        void removeAllOcurrences(Element &e);                               //DONE
-        void removeBlockPosition(int &pos);                                 //DONE
-        void insertElement(int &pos, Element &e);                           //DONE
-        void modifyAllOcurrences(Element &one, Element &two);               //DONE
-        void push_front(Element &e, int &num);                              //DONE
-        void push_back(Element &e, int &num);                               //DONE
-        static void sortVectorCCL(vector<CompactChainList> &v);             //DONE
+        void set(int pos, Element e);
+        void removeFirstOcurrence(Element e);
+        void removeAllOcurrences(Element e);
+        void removeBlockPosition(int pos);
+        void insertElement(int pos, Element e);
+        void modifyAllOcurrences(Element one, Element two);
+        void push_front(Element e, int num);
+        void push_back(Element e, int num);
+        static void sortVectorCCL(vector<CompactChainList> &v);
 
-        void combineEquals();                                               //DONE
-        int getBlockIndex(const int &pos) const;                            //DONE
-        void consecutiveBlock();                                            //DONE
+        void combineEquals();
+        int getBlockIndex(const int &pos) const;
+        void consecutiveBlock();
+        void print() const;
 };
 
 #endif
