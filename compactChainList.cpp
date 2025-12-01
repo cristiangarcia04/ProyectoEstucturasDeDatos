@@ -383,55 +383,59 @@ void CompactChainList::removeBlockPosition(int pos) {
 
 
 void CompactChainList::insertElement(int pos, Element e){
+    bool procesado = false;
+    
     if (pos == CCLsize) {
         CCL.push_back(pair<Element, int>{e, 1});
         CCLsize++;
-        return;
+        procesado = true;
     }
 
-    if (pos == 0) {
+    if (!procesado && pos == 0) {
         CCL.insert(CCL.begin(), pair<Element, int>{e, 1});
         CCLsize++;
-        return;
+        procesado = true;
     }
 
-    int indexCCL = getBlockIndex(pos);
+    if (!procesado) {
+        int indexCCL = getBlockIndex(pos);
 
-    int cnt = 0;
+        int cnt = 0;
 
-    for(int i = 0; i < indexCCL; i++){
-        cnt += CCL[i].second;
-    }
+        for(int i = 0; i < indexCCL; i++){
+            cnt += CCL[i].second;
+        }
 
-    int posEnBloque = pos - cnt;
-    int izquierda = posEnBloque;
-    int derecha = CCL[indexCCL].second - posEnBloque;
-    Element orig = CCL[indexCCL].first;
+        int posEnBloque = pos - cnt;
+        int izquierda = posEnBloque;
+        int derecha = CCL[indexCCL].second - posEnBloque;
+        Element orig = CCL[indexCCL].first;
 
-    if(orig == e){
-        CCL[indexCCL].second++;
-        CCLsize++;
-    }
-    else {
-        CCL.erase(CCL.begin() + indexCCL);
-        int posInsert = indexCCL;
+        if(orig == e){
+            CCL[indexCCL].second++;
+            CCLsize++;
+        }
+        else {
+            CCL.erase(CCL.begin() + indexCCL);
+            int posInsert = indexCCL;
+                
+            if (izquierda > 0) {
+                CCL.insert(CCL.begin() + posInsert, pair<Element, int>{orig, izquierda});
+                posInsert++;
+            }
             
-        if (izquierda > 0) {
-            CCL.insert(CCL.begin() + posInsert, pair<Element, int>{orig, izquierda});
+            CCL.insert(CCL.begin() + posInsert, pair<Element, int>{e, 1});
             posInsert++;
+            
+            if (derecha > 0) {
+                CCL.insert(CCL.begin() + posInsert, pair<Element, int>{orig, derecha});
+            }
+            
+            CCLsize++;
         }
         
-        CCL.insert(CCL.begin() + posInsert, pair<Element, int>{e, 1});
-        posInsert++;
-        
-        if (derecha > 0) {
-            CCL.insert(CCL.begin() + posInsert, pair<Element, int>{orig, derecha});
-        }
-        
-        CCLsize++;
+        consecutiveBlock();
     }
-    
-    consecutiveBlock();
 }
 
 
@@ -474,47 +478,43 @@ void CompactChainList::push_back(Element e, int num){
 
 
 void CompactChainList::sortVectorCCL(vector<CompactChainList> &v){
-    if(v.size() <= 1) {
-        return v;
-    }
-
-    vector<CompactChainList> ordenado;
-    ordenado.push_back(CompactChainList(v[0]));
-    
-    for(int i = 1; i < v.size(); i++){
-        int posicion = ordenado.size();
-        for(int j = 0; j < ordenado.size(); j++){
-            if(v[i] < ordenado[j] && posicion == ordenado.size()){
-                posicion = j;
+    if(v.size() > 1) {
+        vector<CompactChainList> ordenado;
+        ordenado.push_back(CompactChainList(v[0]));
+        
+        for(int i = 1; i < v.size(); i++){
+            int posicion = ordenado.size();
+            for(int j = 0; j < ordenado.size(); j++){
+                if(v[i] < ordenado[j] && posicion == ordenado.size()){
+                    posicion = j;
+                }
             }
+            ordenado.insert(ordenado.begin() + posicion, CompactChainList(v[i]));
         }
-        ordenado.insert(ordenado.begin() + posicion, CompactChainList(v[i]));
-    }
-    
-    v.clear();
-    for(int i = 0; i < ordenado.size(); i++){
-        v.push_back(CompactChainList(ordenado[i]));
+        
+        v.clear();
+        for(int i = 0; i < ordenado.size(); i++){
+            v.push_back(CompactChainList(ordenado[i]));
+        }
     }
 }
 
 
 void CompactChainList::combineEquals(){
-    if (CCL.empty()) {
-        return;
-    }
-    sort (CCL.begin(), CCL.end());
-    vector <pair<Element, int>> aux;
-    aux.push_back(CCL[0]);
+    if (!CCL.empty()) {
+        sort (CCL.begin(), CCL.end());
+        vector <pair<Element, int>> aux;
+        aux.push_back(CCL[0]);
 
-    for (int i = 1; i < CCL.size(); i++) {
-        if (CCL[i].first == aux[aux.size() - 1].first) {
-            aux[aux.size() - 1].second += CCL[i].second;
-        } else {
-            aux.push_back(CCL[i]);
+        for (int i = 1; i < CCL.size(); i++) {
+            if (CCL[i].first == aux[aux.size() - 1].first) {
+                aux[aux.size() - 1].second += CCL[i].second;
+            } else {
+                aux.push_back(CCL[i]);
+            }
         }
+        CCL = aux;
     }
-    CCL = aux;
-
 }
 
 
