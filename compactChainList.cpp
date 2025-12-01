@@ -1,4 +1,4 @@
-#include "CompactChainList.h"
+#include "compactChainList.h"
 
 
 CompactChainList::CompactChainList(){
@@ -22,17 +22,17 @@ CompactChainList::CompactChainList(vector<Element> &v){
                 count +=1;
             }
             else {
-                CCL.push_back(pair{e,count});
+                CCL.push_back(pair<Element, int>{e,count});
                 e = v[i];
                 count = 1;
             }
         }
-        CCL.push_back(pair{e,count});
+        CCL.push_back(pair<Element, int>{e,count});
     }
 }
 
 
-CompactChainList::CompactChainList(CompactChainList &c){
+CompactChainList::CompactChainList(const CompactChainList &c){
     CCL = c.CCL;
     CCLsize = c.CCLsize;
 }
@@ -43,7 +43,7 @@ int CompactChainList::size(){
 }
 
 
-int CompactChainList::searchElement(Element &e){
+int CompactChainList::searchElement(Element e){
     int pos = 0;
     bool flag = false;
 
@@ -231,7 +231,7 @@ bool CompactChainList::operator==(const CompactChainList &oth) const{
         return false;
     }
 
-    for (int i = 0; i < CCLsize();i++) {
+    for (int i = 0; i < CCL.size();i++) {
         if (CCL[i].first != oth.CCL[i].first || CCL[i].second != oth.CCL[i].second) {
             return false;
         }
@@ -255,18 +255,22 @@ Element CompactChainList::operator[](const int pos) const{
 CompactChainList CompactChainList::operator+(const CompactChainList &oth) const{
     CompactChainList aux;
     if (oth.CCL.empty() && !CCL.empty()) {
-        return CCL;
+        aux.CCL = CCL;
+        aux.CCLsize = CCLsize;
+        return aux;
     }
 
     if (!oth.CCL.empty() && CCL.empty()) {
-        return oth;
+        aux.CCL = oth.CCL;
+        aux.CCLsize = oth.CCLsize;
+        return aux;
     }
 
     if (oth.CCL.empty() && CCL.empty()) {
         return aux;
     }
     
-    int i, j = 0;
+    int i = 0, j = 0;
 
     while (i < CCL.size() && j < oth.CCL.size()) {
         Element e1 = CCL[i].first;
@@ -274,15 +278,16 @@ CompactChainList CompactChainList::operator+(const CompactChainList &oth) const{
 
         if (e1 < e2) {
             aux.CCL.push_back(CCL[i]);
-            aux += oth.CCL[i].second;
+            aux.CCLsize += CCL[i].second;
             i++;
         } else if (e1 > e2) {
             aux.CCL.push_back(oth.CCL[j]);
-            aux += oth.CCL[j].second;
+            aux.CCLsize += oth.CCL[j].second;
             j++;
         } else  {
             int fusion = CCL[i].second + oth.CCL[j].second;
-            aux.CCL.push_back(pair {e1, fusion});
+            aux.CCL.push_back(pair<Element, int>{e1, fusion});
+            aux.CCLsize += fusion;
             i++;
             j++;  
         }
@@ -290,20 +295,20 @@ CompactChainList CompactChainList::operator+(const CompactChainList &oth) const{
 
     while (j < oth.CCL.size()) {
         aux.CCL.push_back(oth.CCL[j]);
-        aux += oth.CCL[j].second;
+        aux.CCLsize += oth.CCL[j].second;
         j++;
     }
     
     while (i < CCL.size()) {
         aux.CCL.push_back(CCL[i]);
-        aux += oth.CCL[i].second;
+        aux.CCLsize += CCL[i].second;
         i++;
     }
     return aux;
 }
 
 
-void CompactChainList::set(int &pos, Element &e) {
+void CompactChainList::set(int pos, Element e) {
     int indiceBloque = getBlockIndex(pos);
     
     int conteo = 0;
@@ -321,22 +326,22 @@ void CompactChainList::set(int &pos, Element &e) {
         int posInsert = indiceBloque;
             
         if (izquierda > 0) {
-            CCL.insert(CCL.begin() + posInsert, pair{orig, izquierda});
+            CCL.insert(CCL.begin() + posInsert, pair<Element, int>{orig, izquierda});
             posInsert++;
         }
         
-        CCL.insert(CCL.begin() + posInsert, pair{e, 1});
+        CCL.insert(CCL.begin() + posInsert, pair<Element, int>{e, 1});
         posInsert++;
         
         if (derecha > 0) {
-            CCL.insert(CCL.begin() + posInsert, pair{orig, derecha});
+            CCL.insert(CCL.begin() + posInsert, pair<Element, int>{orig, derecha});
         }
     }
     consecutiveBlock();
 }
 
 
-void CompactChainList::removeFirstOcurrence(Element &e){
+void CompactChainList::removeFirstOcurrence(Element e){
     bool eliminado = false;
     for (int i = 0; i < CCL.size() && !eliminado; i++){
         if(CCL[i].first == e){
@@ -353,7 +358,7 @@ void CompactChainList::removeFirstOcurrence(Element &e){
 }
 
 
-void CompactChainList::removeAllOcurrences(Element &e){
+void CompactChainList::removeAllOcurrences(Element e){
     int i = 0;
     while (i < CCL.size()){
         if(CCL[i].first == e){
@@ -367,7 +372,7 @@ void CompactChainList::removeAllOcurrences(Element &e){
 }
 
 
-void CompactChainList::removeBlockPosition(int &pos) {
+void CompactChainList::removeBlockPosition(int pos) {
     int indice = getBlockIndex(pos);
 
     CCLsize -= CCL[indice].second;
@@ -377,14 +382,16 @@ void CompactChainList::removeBlockPosition(int &pos) {
 }
 
 
-void CompactChainList::insertElement(int &pos, Element &e){
+void CompactChainList::insertElement(int pos, Element e){
     if (pos == CCLsize) {
-        CCL.push_back({e, 1});
+        CCL.push_back(pair<Element, int>{e, 1});
+        CCLsize++;
         return;
     }
 
     if (pos == 0) {
-        CCL.push_front(CCL.begin {e, 1});
+        CCL.insert(CCL.begin(), pair<Element, int>{e, 1});
+        CCLsize++;
         return;
     }
 
@@ -410,15 +417,15 @@ void CompactChainList::insertElement(int &pos, Element &e){
         int posInsert = indexCCL;
             
         if (izquierda > 0) {
-            CCL.insert(CCL.begin() + posInsert, pair{orig, izquierda});
+            CCL.insert(CCL.begin() + posInsert, pair<Element, int>{orig, izquierda});
             posInsert++;
         }
         
-        CCL.insert(CCL.begin() + posInsert, pair{e, 1});
+        CCL.insert(CCL.begin() + posInsert, pair<Element, int>{e, 1});
         posInsert++;
         
         if (derecha > 0) {
-            CCL.insert(CCL.begin() + posInsert, pair{orig, derecha});
+            CCL.insert(CCL.begin() + posInsert, pair<Element, int>{orig, derecha});
         }
         
         CCLsize++;
@@ -428,7 +435,7 @@ void CompactChainList::insertElement(int &pos, Element &e){
 }
 
 
-void CompactChainList::modifyAllOcurrences(Element &one, Element &two){
+void CompactChainList::modifyAllOcurrences(Element one, Element two){
     for(int i = 0; i < CCL.size(); i++){
         if(CCL[i].first == one){
             CCL[i].first = two;
@@ -438,23 +445,23 @@ void CompactChainList::modifyAllOcurrences(Element &one, Element &two){
 }
 
 
-void CompactChainList::push_front(Element &e, int &num){
+void CompactChainList::push_front(Element e, int num){
     if(CCL.empty()){
-        CCL.push_back(pair{e, num});
+        CCL.push_back(pair<Element, int>{e, num});
     }
     else if(CCL[0].first == e){
             CCL[0].second += num;
     }
     else{
-        CCL.insert(CCL.begin(), pair{e,num});
+        CCL.insert(CCL.begin(), pair<Element, int>{e,num});
     }
     CCLsize += num;
 }
 
 
-void CompactChainList::push_back(Element &e, int &num){
+void CompactChainList::push_back(Element e, int num){
     if(CCL.empty()){
-        CCL.push_back(pair{e, num});
+        CCL.push_back(pair<Element, int>{e, num});
     }
     else if(CCL[CCL.size()-1].first == e){
             CCL[CCL.size()-1].second += num;
@@ -467,7 +474,27 @@ void CompactChainList::push_back(Element &e, int &num){
 
 
 void CompactChainList::sortVectorCCL(vector<CompactChainList> &v){
-    sort(v.begin(), v.end());
+    if(v.size() <= 1) {
+        return v;
+    }
+
+    vector<CompactChainList> ordenado;
+    ordenado.push_back(CompactChainList(v[0]));
+    
+    for(int i = 1; i < v.size(); i++){
+        int posicion = ordenado.size();
+        for(int j = 0; j < ordenado.size(); j++){
+            if(v[i] < ordenado[j] && posicion == ordenado.size()){
+                posicion = j;
+            }
+        }
+        ordenado.insert(ordenado.begin() + posicion, CompactChainList(v[i]));
+    }
+    
+    v.clear();
+    for(int i = 0; i < ordenado.size(); i++){
+        v.push_back(CompactChainList(ordenado[i]));
+    }
 }
 
 
@@ -524,4 +551,13 @@ void CompactChainList::consecutiveBlock() {
         }
         CCL = aux;
     }
+
+}
+void CompactChainList::print() const {
+    printf("[");
+    for(int i = 0; i < CCL.size(); i++){
+        if(i > 0) printf(", ");
+        printf("(%d,%d)", CCL[i].first, CCL[i].second);
+    }
+    printf("]\n");    
 }
