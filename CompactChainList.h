@@ -42,12 +42,12 @@ class CompactChainList {
         void modifyAllOcurrences(Element one, Element two);
         void push_front(Element e, int num);
         void push_back(Element e, int num);
-        static void sortVectorCCL(vector<CompactChainList> &v);
+        void sortVectorCCL(vector<CompactChainList> &v);
 
         void combineEquals();
         int getBlockIndex(const int &pos) const;
         void consecutiveBlock();
-        void print() const;
+        void print();
 };
 
 #endif
